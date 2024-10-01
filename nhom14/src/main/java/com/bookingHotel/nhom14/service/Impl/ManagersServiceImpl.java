@@ -2,7 +2,8 @@ package com.bookingHotel.nhom14.service.Impl;
 
 import com.bookingHotel.nhom14.dto.ManagersDTO;
 import com.bookingHotel.nhom14.entity.Managers;
-import com.bookingHotel.nhom14.mapper.ManagersMapper;
+import com.bookingHotel.nhom14.mapper.ManagerMapper;
+
 import com.bookingHotel.nhom14.repository.ManagersRepository;
 import com.bookingHotel.nhom14.service.ManagersService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,11 +15,14 @@ import java.util.List;
 public class ManagersServiceImpl implements ManagersService {
     @Autowired
     private ManagersRepository managersRepository;
+
+    @Autowired
+    private ManagerMapper managerMapper;
     @Override
     public ManagersDTO createManagers(ManagersDTO managersDTO) {
-        Managers manager = ManagersMapper.mapToManagers(managersDTO);
+        Managers manager = managerMapper.mapToManager(managersDTO);
         Managers savedManagers = managersRepository.save(manager);
-        return ManagersMapper.mapToManagersDTO(savedManagers);
+        return managerMapper.mapToManagerDTO(savedManagers);
     }
 
     @Override
