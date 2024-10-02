@@ -1,6 +1,6 @@
 package com.bookingHotel.nhom14.controller;
 
-import com.bookingHotel.nhom14.dto.ApiResponse;
+import com.bookingHotel.nhom14.dto.response.ApiResponse;
 import com.bookingHotel.nhom14.dto.CustomerDTO;
 import com.bookingHotel.nhom14.service.Impl.CustomerServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;

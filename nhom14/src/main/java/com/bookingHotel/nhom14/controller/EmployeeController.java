@@ -1,8 +1,7 @@
 package com.bookingHotel.nhom14.controller;
 
-import com.bookingHotel.nhom14.dto.ApiResponse;
+import com.bookingHotel.nhom14.dto.response.ApiResponse;
 import com.bookingHotel.nhom14.dto.EmployeeDTO;
-import com.bookingHotel.nhom14.entity.Employee;
 import com.bookingHotel.nhom14.service.Impl.EmployeeServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 

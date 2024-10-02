@@ -1,7 +1,7 @@
 package com.bookingHotel.nhom14.exception;
 
 
-import com.bookingHotel.nhom14.dto.ApiResponse;
+import com.bookingHotel.nhom14.dto.response.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

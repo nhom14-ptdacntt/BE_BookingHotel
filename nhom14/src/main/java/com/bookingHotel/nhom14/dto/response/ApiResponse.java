@@ -1,4 +1,4 @@
-package com.bookingHotel.nhom14.dto;
+package com.bookingHotel.nhom14.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
