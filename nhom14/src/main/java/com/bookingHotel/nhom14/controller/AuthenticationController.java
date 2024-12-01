@@ -1,6 +1,5 @@
 package com.bookingHotel.nhom14.controller;
 
-
 import com.bookingHotel.nhom14.core.util.Logger;
 import com.bookingHotel.nhom14.dto.UsersDTO;
 import com.bookingHotel.nhom14.dto.request.IntrospectRequest;
@@ -18,12 +17,14 @@ import java.text.ParseException;
 @RequestMapping("auth")
 @CrossOrigin("*")
 public class AuthenticationController {
+
     @Autowired
     private AuthenticationService authenticationService;
 
     @PostMapping("/token")
     public ApiResponse<AuthenticationResponse> authentication(@RequestBody UsersDTO usersDTO) {
         ApiResponse<AuthenticationResponse> response = new ApiResponse<>();
+        Logger.DebugLogic("Start authen:  ");
         AuthenticationResponse authenticationResponse = authenticationService.authenticate(usersDTO);
         Logger.DebugLogic("DONE AUTHEN ??? :  " + authenticationResponse.toString());
         response.setResult(authenticationResponse);

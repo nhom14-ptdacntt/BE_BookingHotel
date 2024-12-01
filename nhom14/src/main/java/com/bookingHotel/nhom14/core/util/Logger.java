@@ -1,19 +1,21 @@
 package com.bookingHotel.nhom14.core.util;
 
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.time.LocalDateTime;import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class Logger {
 
     private static final DateTimeFormatter dtFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-private static final boolean DEBUG = true;
+    private static final boolean DEBUG = true;
+
     public static void DebugLogic(String str, int deep) {
         if (!DEBUG) {
             return;
         }
         try {
-            str += "\n\t==> at " + Thread.currentThread().getStackTrace()[2 + deep];
+            str += "\n\tat " + Thread.currentThread().getStackTrace()[2 + deep];
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -25,7 +27,7 @@ private static final boolean DEBUG = true;
             return;
         }
         try {
-            str += "\n\t==> at " + Thread.currentThread().getStackTrace()[2];
+            str += "\n\tat " + Thread.currentThread().getStackTrace()[2];
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -33,6 +35,10 @@ private static final boolean DEBUG = true;
     }
 
     public static void DebugLogic(String message, Exception exception) {
+        System.out.println("wtf ?");
+        if (!DEBUG) {
+            return;
+        }
         String timestamp = dtFormatter.format(LocalDateTime.now());  // Lấy thời gian hiện tại
         // Nội dung log
         StringBuilder logContent = new StringBuilder();
@@ -49,5 +55,6 @@ private static final boolean DEBUG = true;
             logContent.append("<>StackTrace: ").append(sw.toString()).append("\n");
         }
         logContent.append("------------------------------------\n");
+        System.out.println(logContent.toString());
     }
 }
