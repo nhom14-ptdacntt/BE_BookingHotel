@@ -1,6 +1,8 @@
 package com.bookingHotel.nhom14.controller;
 
-import com.bookingHotel.nhom14.dto.CustomerDTO;
+
+import com.bookingHotel.nhom14.core.util.Logger;
+import com.bookingHotel.nhom14.dto.UsersDTO;
 import com.bookingHotel.nhom14.dto.request.IntrospectRequest;
 import com.bookingHotel.nhom14.dto.response.ApiResponse;
 import com.bookingHotel.nhom14.dto.response.AuthenticationResponse;
@@ -19,12 +21,13 @@ public class AuthenticationController {
     @Autowired
     private AuthenticationService authenticationService;
 
-    @GetMapping("/token")
-    public ApiResponse<AuthenticationResponse> authentication(@RequestBody CustomerDTO customerDTO) {
-        ApiResponse apiResponse = new ApiResponse<>();
-        AuthenticationResponse authenticationResponse = authenticationService.authenticate(customerDTO);
-        apiResponse.setResult(authenticationResponse);
-        return apiResponse;
+    @PostMapping("/token")
+    public ApiResponse<AuthenticationResponse> authentication(@RequestBody UsersDTO usersDTO) {
+        ApiResponse<AuthenticationResponse> response = new ApiResponse<>();
+        AuthenticationResponse authenticationResponse = authenticationService.authenticate(usersDTO);
+        Logger.DebugLogic("DONE AUTHEN ??? :  " + authenticationResponse.toString());
+        response.setResult(authenticationResponse);
+        return response;
     }
 
     @PostMapping("/introspect")
