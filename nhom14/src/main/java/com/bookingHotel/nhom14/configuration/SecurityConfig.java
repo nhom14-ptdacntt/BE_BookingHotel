@@ -1,5 +1,6 @@
 package com.bookingHotel.nhom14.configuration;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -8,6 +9,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.web.cors.CorsConfiguration;
@@ -22,6 +25,9 @@ public class SecurityConfig {
             "/api/v1/create_user","/auth/token",
     };
 
+    @Autowired
+    private CustomJwtDecoder jwtDecoder;
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         // Phân quyền truy cập
@@ -35,15 +41,25 @@ public class SecurityConfig {
                         .permitAll()
                         .anyRequest()
                         .authenticated());
-        // OAuth2 Resource Server với JWT, xử lý các yêu cầu có chứa JWT token
-//        httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
-//                        .decoder(jwtDecoder)
-//                        .jwtAuthenticationConverter(jwtAuthenticationConverter())) // convert scopes to roles
-//                .authenticationEntryPoint(new JwtAuthenticationEntryPoint())); // handle exception 401 unauthorized
+//         OAuth2 Resource Server với JWT, xử lý các yêu cầu có chứa JWT token
+        httpSecurity.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
+                        .decoder(jwtDecoder)
+                        .jwtAuthenticationConverter(jwtAuthenticationConverter())) // convert scopes to roles
+                .authenticationEntryPoint(new JwtAuthenticationEntryPoint())); // handle exception 401 unauthorized
 
         // vô hiệu hóa CSRF
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
         return httpSecurity.build();
+    }
+
+    @Bean
+    JwtAuthenticationConverter jwtAuthenticationConverter() {
+        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("ROLE_");
+
+        JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+        return jwtAuthenticationConverter;
     }
 
 

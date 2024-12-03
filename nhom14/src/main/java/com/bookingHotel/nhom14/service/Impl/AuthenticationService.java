@@ -130,7 +130,4 @@ public class AuthenticationService {
         }
         return scopeBuilder.toString().trim(); // Xóa khoảng trắng thừa ở cuối
     }
-
-
-
 }
