@@ -56,10 +56,7 @@ public class AuthenticationService {
                 .subject(String.valueOf(users.get().getUserID())) // Chứa định danh người dùng, thường là username, userId
                 .issuer("localhost") //là claim chỉ định ai đã phát hành token này, thường là tên máy chủ hoặc dịch vụ phát hành
                 .issueTime(new Date()) //là claim ghi lại thời điểm token được phát hành, ở dây là lấy thời gian hiện tại
-                .expirationTime(new Date( //expirationTime  là claim chỉ định thời gian mà token sẽ hết hạn
-                        Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli() //Instant.now() lấy thời gian hiện tại,
-                        // sau đó .plus(1, ChronoUnit.HOURS) sẽ cộng thêm 1 giờ vào thời gian hiện tại, tạo ra một thời điểm tương lai là 1 giờ sau.
-                ))
+                .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
                 .claim("scope",buildScope(usersDTO))
                 .build();
@@ -112,7 +109,7 @@ public class AuthenticationService {
         Date expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
 
         boolean verified = signedJWT.verify(jwsVerifier);
-        boolean time = expiryTime.before(new Date());
+        boolean time = expiryTime.after(new Date());
         return IntrospectResponse.builder()
                 .valid(verified && time)
                 .build();
