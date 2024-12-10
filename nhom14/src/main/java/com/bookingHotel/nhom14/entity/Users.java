@@ -1,7 +1,5 @@
 package com.bookingHotel.nhom14.entity;
 
-
-import com.bookingHotel.nhom14.enums.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,6 +14,7 @@ import java.util.Set;
 @Setter
 @Builder
 public class Users {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int userID;

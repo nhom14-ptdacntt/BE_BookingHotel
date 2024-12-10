@@ -11,18 +11,16 @@ import lombok.*;
 @Setter
 @Builder
 public class Room {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int roomId;
-    private String roomNumber;
-    private int bed;
-    private int bath;
+    private int id;
+    private String number;
     private String description;
     private double price;
-    private String image;
     private String status;
 
     @ManyToOne
-    @JoinColumn(name = "room_typeid")
-    private RoomType roomTypeID;
+    @JoinColumn(name = "id")
+    private RoomType roomType;
 }

@@ -8,5 +8,6 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 public class IntrospectRequest {
+
     private String token;
 }

@@ -57,4 +57,25 @@ public class Logger {
         logContent.append("------------------------------------\n");
         System.out.println(logContent.toString());
     }
+
+    public static void logError(String message, Exception exception) {
+        String timestamp = dtFormatter.format(LocalDateTime.now());  // Lấy thời gian hiện tại
+        // Nội dung log
+        StringBuilder logContent = new StringBuilder();
+        logContent.append("====================================\n");
+        logContent.append("<>Time: ").append(timestamp).append("\n");
+        logContent.append("<>Message: ").append(message).append("\n");
+        logContent.append("<>CallFrom: at ").append(Thread.currentThread().getStackTrace()[2]).append("\n");
+        if (exception != null) {
+            // Lấy thông tin stack trace từ exception dưới dạng String
+            StringWriter sw = new StringWriter();
+            PrintWriter pw = new PrintWriter(sw);
+            exception.printStackTrace(pw);  // In stack trace vào StringWriter
+            logContent.append("<>Exception: ").append(exception.toString()).append("\n");
+            logContent.append("<>StackTrace: ").append(sw.toString()).append("\n");
+        }
+        logContent.append("------------------------------------\n");
+        System.err.println(logContent.toString());
+    }
+
 }

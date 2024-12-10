@@ -1,6 +1,5 @@
 package com.bookingHotel.nhom14.service.Impl;
 
-
 import com.bookingHotel.nhom14.core.util.Logger;
 import com.bookingHotel.nhom14.dto.UsersDTO;
 import com.bookingHotel.nhom14.dto.request.IntrospectRequest;
@@ -32,11 +31,10 @@ import java.util.Set;
 import java.util.UUID;
 
 @Service
-
 public class AuthenticationService {
+
     @Autowired
     private UserRepository userRepository;
-
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -48,7 +46,9 @@ public class AuthenticationService {
     public String generateJwt(UsersDTO usersDTO) {
         Optional<Users> users = userRepository.findByEmail(usersDTO.getEmail());
 
-        if(users.isEmpty()) { throw new AppException(ErrorCode.USER_NOT_EXISTED);}
+        if (users.isEmpty()) {
+            throw new AppException(ErrorCode.USER_NOT_EXISTED);
+        }
 
         JWSHeader header = new JWSHeader(JWSAlgorithm.HS512);
 
@@ -58,37 +58,37 @@ public class AuthenticationService {
                 .issueTime(new Date()) //là claim ghi lại thời điểm token được phát hành, ở dây là lấy thời gian hiện tại
                 .expirationTime(new Date(Instant.now().plus(1, ChronoUnit.HOURS).toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
-                .claim("scope",buildScope(usersDTO))
+                .claim("scope", buildScope(usersDTO))
                 .build();
         Payload payload = new Payload(jwtClaimsSet.toJSONObject());
         //Tạo một đối tượng JWSObject bằng cách kết hợp header và payload
-        JWSObject jwsObject = new JWSObject(header,payload);
+        JWSObject jwsObject = new JWSObject(header, payload);
 
         //generate signature
         try {
             jwsObject.sign(new MACSigner(SIGNER_KEY.getBytes())); //Ký JWSObject bằng cách sử dụng MACSigner và khóa bí mật
             return jwsObject.serialize(); //Chuyển đổi JWSObject đã ký thành một chuỗi JWT hoàn chỉnh để có thể sử dụng.
         } catch (JOSEException e) { //Xử lý ngoại lệ nếu có lỗi xảy ra trong quá trình ký.
-            Logger.DebugLogic("ERROR SIGN: " ,e);
+            Logger.DebugLogic("ERROR SIGN: ", e);
             throw new RuntimeException(e);
         }
     }
 
     public AuthenticationResponse authenticate(UsersDTO usersDTO) {
         Users users = new Users();
-        if(userRepository.existsByEmail(usersDTO.getEmail())) {
+        if (userRepository.existsByEmail(usersDTO.getEmail())) {
             Optional<Users> userFind = userRepository.findByEmail(usersDTO.getEmail());
-            if(userFind.isEmpty()) {
+            if (userFind.isEmpty()) {
 
                 throw new AppException(ErrorCode.USER_NOT_EXISTED);
             }
-             users = userFind.get();
+            users = userFind.get();
         } else {
             throw new AppException(ErrorCode.EMAIL_NOT_EXISTED);
         }
 
-        boolean checkPassword = passwordEncoder.matches(usersDTO.getPassword(),users.getPassword());
-        if(!checkPassword) {
+        boolean checkPassword = passwordEncoder.matches(usersDTO.getPassword(), users.getPassword());
+        if (!checkPassword) {
             throw new AppException(ErrorCode.PASSWORD_FAILED);
         }
         String token = generateJwt(usersDTO);
@@ -114,6 +114,7 @@ public class AuthenticationService {
                 .valid(verified && time)
                 .build();
     }
+
     private String buildScope(UsersDTO usersDTO) {
 
         Optional<Users> users = userRepository.findByEmail(usersDTO.getEmail());
@@ -122,7 +123,7 @@ public class AuthenticationService {
         StringBuilder scopeBuilder = new StringBuilder();
         if (!roles.isEmpty()) {
             for (String role : roles) {
-                scopeBuilder.append(role  ).append(" ");
+                scopeBuilder.append(role).append(" ");
             }
         }
         return scopeBuilder.toString().trim(); // Xóa khoảng trắng thừa ở cuối
