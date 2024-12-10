@@ -14,4 +14,5 @@ public class RoomDTO {
     private String checkInDate;
     private String checkOutDate;
     private String status;
+
 }

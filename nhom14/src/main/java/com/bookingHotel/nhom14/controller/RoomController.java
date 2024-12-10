@@ -4,10 +4,11 @@
  */
 package com.bookingHotel.nhom14.controller;
 
-import com.bookingHotel.nhom14.core.util.Logger;
 import com.bookingHotel.nhom14.dto.RoomDTO;
 import com.bookingHotel.nhom14.dto.response.ApiResponse;
 import com.bookingHotel.nhom14.entity.Room;
+import com.bookingHotel.nhom14.exception.ApiException;
+import com.bookingHotel.nhom14.exception.AppException;
 import com.bookingHotel.nhom14.service.Impl.RoomService;
 import com.bookingHotel.nhom14.service.Impl.RoomTypeService;
 import java.util.List;
@@ -34,36 +35,33 @@ public class RoomController {
 
     @GetMapping()
     public ApiResponse getAllRoom() {
-        try {
-            return ApiResponse.<List<Room>>builder()
-                    .result(roomService.findAll())
-                    .build();
-        } catch (Exception e) {
-            Logger.DebugLogic("ERROR getAllRoom ? ", e);
-            return ApiResponse.<Object>builder()
-                    .result(null)
-                    .build();
-        }
+        return ApiResponse.<List<Room>>builder()
+                .result(roomService.findAll())
+                .build();
     }
 
     @PostMapping("/edit/{id}")
     public ApiResponse editRoom(@RequestBody RoomDTO roomDTO) {
-        try {
 
-            var room = roomService.findById(roomDTO.getId());
-            if (room == null) {
-                throw new RuntimeException("not found room id: " + roomDTO.getId());
-            }
-
-            return ApiResponse.<RoomDTO>builder()
-                    .result(roomDTO)
-                    .build();
-        } catch (Exception e) {
-            Logger.DebugLogic("ERROR editRoom ? ", e);
-            return ApiResponse.<Object>builder()
-                    .result(null)
-                    .build();
+        var room = roomService.findById(roomDTO.getId());
+        if (room == null) {
+            throw new ApiException(ApiException.ERROR_FIND, "not found room id: " + roomDTO.getId());
         }
+
+        var roomType = roomTypeService.findById(roomDTO.getRoomTypeId());
+        if (roomType == null) {
+            throw new ApiException(ApiException.ERROR_FIND, "not found room type id: " + roomDTO.getRoomTypeId());
+        }
+
+        room.setNumber(roomDTO.getRoomNumber());
+        room.setRoomType(roomType);
+        room.setPrice(roomDTO.getPrice());
+
+        roomDTO = roomService.save(room);
+
+        return ApiResponse.<RoomDTO>builder()
+                .result(roomDTO)
+                .build();
     }
 
 }

@@ -4,6 +4,7 @@
  */
 package com.bookingHotel.nhom14.service.Impl;
 
+import com.bookingHotel.nhom14.entity.Room;
 import com.bookingHotel.nhom14.entity.RoomType;
 import com.bookingHotel.nhom14.repository.impl.RoomTypeRepository;
 import com.bookingHotel.nhom14.service.IServiceFind;
@@ -31,4 +32,5 @@ public class RoomTypeService implements IServiceFind<RoomType, Integer> {
     public RoomType findById(Integer id) {
         return roomTypeRepo.findById(id).orElse(null);
     }
+
 }
