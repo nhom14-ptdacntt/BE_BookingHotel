@@ -59,17 +59,6 @@ public class BookingController {
         }
     }
 
-    private void validateRoom(Room room) {
-        if (room == null) {
-            throw new ApiException(ApiException.ERROR_CREATE, "Not found room number");
-        }
-
-        if (!ConstRoom.isRoomAvaiable(room.getRoomStatus().getName())) {
-            throw new ApiException(ApiException.ERROR_CREATE, "Room is not avaiable : " + room.getRoomStatus().getName());
-        }
-
-    }
-
     @PostMapping("/create")
     public synchronized ApiResponse create(@RequestBody BookingDTO bookingDTO) {
         var customerName = bookingDTO.getCustomerName();
@@ -79,7 +68,12 @@ public class BookingController {
         this.validateCustomerPhoneNumber(customerPhoneNumber);
 
         var room = roomService.findByNumber(bookingDTO.getRoomNumber());
-        this.validateRoom(room);
+        if (room == null) {
+            throw new ApiException(ApiException.ERROR_CREATE, "Not found room number");
+        }
+        if (!ConstRoom.isRoomAvaiable(room.getRoomStatus().getName())) {
+            throw new ApiException(ApiException.ERROR_CREATE, "Room is not avaiable : " + room.getRoomStatus().getName());
+        }
 
         var booking = new Booking();
         booking.setCustomerName(customerName);
@@ -113,12 +107,22 @@ public class BookingController {
         this.validateCustomerPhoneNumber(customerPhoneNumber);
 
         var room = roomService.findByNumber(bookingDTO.getRoomNumber());
-        this.validateRoom(room);
+        if (room == null) {
+            throw new ApiException(ApiException.ERROR_CREATE, "Not found room number");
+        }
 
         var booking = bookingRepo.findById(id)
                 .orElseThrow(
                         () -> new ApiException(ApiException.ERROR_CREATE, "Booking not found")
                 );
+
+        if (ConstBooking.isFinished(booking.getStatus().getName())
+                || ConstBooking.isCancelled(booking.getStatus().getName())) {
+            return ApiResponse.<Object>builder()
+                    .result(booking)
+                    .build();
+        }
+
         booking.setCustomerName(customerName);
         booking.setCustomerPhoneNumber(customerPhoneNumber);
         booking.setRoom(room);
@@ -154,7 +158,7 @@ public class BookingController {
                 .build();
     }
 
-    @DeleteMapping("/cancel/{id}")
+    @PostMapping("/cancel/{id}")
     public synchronized ApiResponse cancelBooking(@PathVariable int id) {
 
         var booking = bookingRepo.findById(id)
