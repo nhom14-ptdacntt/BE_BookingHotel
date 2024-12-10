@@ -8,6 +8,8 @@ import com.bookingHotel.nhom14.entity.RoomType;
 import com.bookingHotel.nhom14.repository.impl.RoomTypeRepository;
 import com.bookingHotel.nhom14.service.IServiceFind;
 import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class RoomTypeService implements IServiceFind<RoomType, Integer> {
 
+    @Autowired
     private RoomTypeRepository roomTypeRepo;
 
     @Override

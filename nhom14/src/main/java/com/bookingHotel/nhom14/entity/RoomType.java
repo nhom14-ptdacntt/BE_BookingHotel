@@ -6,6 +6,7 @@ import lombok.*;
 @Entity
 @Table(name = "roomtypes")
 @Data
+@NoArgsConstructor
 public class RoomType {
 
     @Id
