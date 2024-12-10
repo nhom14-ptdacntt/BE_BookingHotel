@@ -40,4 +40,8 @@ public class RoomService implements IServiceFind<Room, Integer> {
         return roomMapper.roomToRoomDTO(roomRepo.save(room));
     }
 
+    public void deleteById(Integer id) {
+        roomRepo.deleteById(id);
+    }
+
 }

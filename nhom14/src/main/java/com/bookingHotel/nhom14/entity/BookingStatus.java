@@ -17,17 +17,17 @@ import lombok.NoArgsConstructor;
  * @author KhanhDzai - https://www.facebook.com/khanhdepzai.pro/
  */
 @Entity
-@Table(name = "room_status")
+@Table(name = "booking_status")
 @Data
 @NoArgsConstructor
-public class RoomStatus {
+public class BookingStatus {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String name;
 
-    public RoomStatus(String name) {
+    public BookingStatus(String name) {
         this.name = name;
     }
 

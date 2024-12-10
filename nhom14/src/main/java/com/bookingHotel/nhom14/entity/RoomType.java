@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "roomtypes")
+@Table(name = "room_types")
 @Data
 @NoArgsConstructor
 public class RoomType {

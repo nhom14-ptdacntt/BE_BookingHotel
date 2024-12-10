@@ -1,11 +1,14 @@
 package com.bookingHotel.nhom14.configuration;
 
+import com.bookingHotel.nhom14.constant.ConstBooking;
 import com.bookingHotel.nhom14.constant.ConstRoom;
+import com.bookingHotel.nhom14.entity.BookingStatus;
 import com.bookingHotel.nhom14.entity.RoomStatus;
 import com.bookingHotel.nhom14.entity.RoomType;
 import com.bookingHotel.nhom14.entity.Users;
 import com.bookingHotel.nhom14.enums.Role;
 import com.bookingHotel.nhom14.repository.UserRepository;
+import com.bookingHotel.nhom14.repository.impl.BookingStatusRepository;
 import com.bookingHotel.nhom14.repository.impl.RoomStatusRepository;
 import com.bookingHotel.nhom14.repository.impl.RoomTypeRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +20,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,10 +32,14 @@ public class ApplicationInitConfig {
     PasswordEncoder passwordEncoder;
 
     @Bean
-    ApplicationRunner createUserDefault(UserRepository userRepository, RoomTypeRepository roomTypeRepository, RoomStatusRepository roomStatusRepository) {
+    ApplicationRunner createUserDefault(UserRepository userRepository,
+            RoomTypeRepository roomTypeRepository,
+            RoomStatusRepository roomStatusRepository,
+            BookingStatusRepository bookingStatusRepository
+    ) {
         return args -> {
             if (userRepository.findByEmail("admin@admin.com").isEmpty()) {
-                Set<String> roles = new HashSet<String>();
+                Set<String> roles = new HashSet<>();
                 roles.add(Role.ADMIN.name());
                 Users admin = Users.builder()
                         .password(passwordEncoder.encode("admin"))
@@ -50,7 +56,26 @@ public class ApplicationInitConfig {
 
             this.createRoomStatus(roomStatusRepository);
 
+            this.createBookingStatus(bookingStatusRepository);
         };
+    }
+
+    private void createBookingStatus(BookingStatusRepository bookingStatusRepository) {
+        // Lấy tất cả RoomType từ database
+        var allValue = bookingStatusRepository.findAll();
+
+        // Tạo Set để kiểm tra nhanh
+        Set<String> existingRoomTypes = allValue.stream()
+                .map(BookingStatus::getName)
+                .collect(Collectors.toSet());
+
+        // Duyệt qua ROOM_TYPE_DEFAULT và thêm các RoomType còn thiếu
+        for (String status : ConstBooking.BOOKING_STATUS_DEFAULT) {
+            if (!existingRoomTypes.contains(status)) {
+                var value = new BookingStatus(status);
+                bookingStatusRepository.save(value);
+            }
+        }
     }
 
     private void createRoomStatus(RoomStatusRepository roomStatusRepository) {
@@ -90,4 +115,5 @@ public class ApplicationInitConfig {
             }
         }
     }
+
 }

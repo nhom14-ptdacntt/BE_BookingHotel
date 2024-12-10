@@ -1,6 +1,5 @@
 package com.bookingHotel.nhom14.entity;
 
-import com.bookingHotel.nhom14.dto.RoomDTO;
 import jakarta.persistence.*;
 import java.sql.Timestamp;
 import lombok.*;
@@ -11,14 +10,13 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-@Builder
 public class Room {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
     private int id;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private int number;
 
     @ManyToOne

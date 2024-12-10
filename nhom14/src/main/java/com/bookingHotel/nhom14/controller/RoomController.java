@@ -38,6 +38,30 @@ public class RoomController {
                 .build();
     }
 
+    @PostMapping("/create")
+    public ApiResponse createRoom(@RequestBody RoomDTO roomDTO) {
+
+        var roomType = roomTypeService.findById(roomDTO.getRoomTypeId());
+        if (roomType == null) {
+            throw new ApiException(ApiException.ERROR_CREATE, "not found room type id: " + roomDTO.getRoomTypeId());
+        }
+
+        var room = new Room();
+        room.setNumber(roomDTO.getRoomNumber());
+        room.setPrice(roomDTO.getPrice());
+        room.setRoomType(roomType);
+        room.setRoomStatus(roomStatusRepo.findById(1)
+                .orElseThrow(
+                        () -> new ApiException(ApiException.ERROR_CREATE, "Room status not found"))
+        );
+
+        roomDTO = roomService.save(room);
+
+        return ApiResponse.<RoomDTO>builder()
+                .result(roomDTO)
+                .build();
+    }
+
     @PostMapping("/edit/{id}")
     public ApiResponse editRoom(@RequestBody RoomDTO roomDTO, @PathVariable int id) {
 
@@ -62,27 +86,11 @@ public class RoomController {
                 .build();
     }
 
-    @PostMapping("/create")
-    public ApiResponse createRoom(@RequestBody RoomDTO roomDTO) {
-
-        var roomType = roomTypeService.findById(roomDTO.getRoomTypeId());
-        if (roomType == null) {
-            throw new ApiException(ApiException.ERROR_CREATE, "not found room type id: " + roomDTO.getRoomTypeId());
-        }
-
-        var room = new Room();
-        room.setNumber(roomDTO.getRoomNumber());
-        room.setPrice(roomDTO.getPrice());
-        room.setRoomType(roomType);
-        room.setRoomStatus(roomStatusRepo.findById(1)
-                .orElseThrow(
-                        () -> new ApiException(ApiException.ERROR_CREATE, "Room status not found"))
-        );
-
-        roomDTO = roomService.save(room);
-
-        return ApiResponse.<RoomDTO>builder()
-                .result(roomDTO)
+    @DeleteMapping("/delete/{id}")
+    public ApiResponse deleteRoom(@PathVariable int id) {
+        roomService.deleteById(id);
+        return ApiResponse.<String>builder()
+                .result("OK")
                 .build();
     }
 
