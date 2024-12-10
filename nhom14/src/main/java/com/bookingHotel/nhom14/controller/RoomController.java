@@ -39,7 +39,7 @@ public class RoomController {
     }
 
     @PostMapping("/edit/{id}")
-    public ApiResponse editRoom(@RequestBody RoomDTO roomDTO, @RequestParam int id) {
+    public ApiResponse editRoom(@RequestBody RoomDTO roomDTO, @PathVariable int id) {
 
         var room = roomService.findById(id);
         if (room == null) {

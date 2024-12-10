@@ -40,4 +40,18 @@ public class RoomTypeController {
         }
     }
 
+    @GetMapping("/{id}")
+    public ApiResponse getRoomTypeNameById() {
+        try {
+            return ApiResponse.<List<RoomType>>builder()
+                    .result(roomTypeService.findAll())
+                    .build();
+        } catch (Exception e) {
+            Logger.DebugLogic("ERROR getAllRoomType ? ", e);
+            return ApiResponse.<Object>builder()
+                    .result(null)
+                    .build();
+        }
+    }
+
 }
