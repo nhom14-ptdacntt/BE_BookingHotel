@@ -1,7 +1,6 @@
 package com.bookingHotel.nhom14.entity;
 
 import jakarta.persistence.*;
-import java.sql.Timestamp;
 import lombok.*;
 
 @Table(name = "rooms")
@@ -25,10 +24,6 @@ public class Room {
 
     @Column(nullable = false)
     private double price;
-
-    private Timestamp checkInDate;
-
-    private Timestamp checkOutDate;
 
     @ManyToOne
     @JoinColumn(name = "status_id")

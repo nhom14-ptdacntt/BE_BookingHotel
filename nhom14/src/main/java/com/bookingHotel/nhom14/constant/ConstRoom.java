@@ -4,7 +4,6 @@
  */
 package com.bookingHotel.nhom14.constant;
 
-import com.bookingHotel.nhom14.entity.Room;
 import java.util.List;
 
 /**
