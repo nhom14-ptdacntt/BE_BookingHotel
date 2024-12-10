@@ -54,24 +54,24 @@ public class RoomService implements IServiceFind<Room, Integer> {
         roomRepo.deleteById(id);
     }
 
-    public void setRoomStatusAvailable(Room room) { 
+    public void setRoomStatusAvailable(Room room) {
         room.setRoomStatus(roomStatusRepo.findById(1)
                 .orElseThrow(
-                        () -> new ApiException(ApiException.ERROR_EDIT, "Room status not found"))
+                        () -> new ApiException(ApiException.ERROR_EDIT, "Room status not found: " + 1))
         );
     }
 
     public void setRoomStatusOccupied(Room room) {
         room.setRoomStatus(roomStatusRepo.findById(2)
                 .orElseThrow(
-                        () -> new ApiException(ApiException.ERROR_EDIT, "Room status not found"))
+                        () -> new ApiException(ApiException.ERROR_EDIT, "Room status not found: " + 2))
         );
     }
 
     public void setRoomStatusBooked(Room room) {
         room.setRoomStatus(roomStatusRepo.findById(3)
                 .orElseThrow(
-                        () -> new ApiException(ApiException.ERROR_EDIT, "Room status not found"))
+                        () -> new ApiException(ApiException.ERROR_EDIT, "Room status not found: " + 3))
         );
     }
 

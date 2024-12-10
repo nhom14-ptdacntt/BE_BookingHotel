@@ -11,11 +11,11 @@ import com.bookingHotel.nhom14.core.util.Validator;
 import com.bookingHotel.nhom14.dto.BookingDTO;
 import com.bookingHotel.nhom14.dto.response.ApiResponse;
 import com.bookingHotel.nhom14.entity.Booking;
-import com.bookingHotel.nhom14.entity.Room;
 import com.bookingHotel.nhom14.exception.ApiException;
 import com.bookingHotel.nhom14.repository.impl.BookingRepository;
 import com.bookingHotel.nhom14.repository.impl.BookingStatusRepository;
 import com.bookingHotel.nhom14.service.Impl.RoomService;
+import java.util.Iterator;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -37,8 +37,21 @@ public class BookingController {
 
     @GetMapping()
     public ApiResponse getAll() {
+
+        var lists = bookingRepo.findAll();
+
+        // Dùng Iterator để tránh lỗi ConcurrentModificationException
+        Iterator<Booking> iterator = lists.iterator();
+        while (iterator.hasNext()) {
+            Booking booking = iterator.next();
+            if (ConstBooking.isCancelled(booking.getStatus().getName())
+                    || ConstBooking.isFinished(booking.getStatus().getName())) {
+                iterator.remove(); // Xóa phần tử an toàn
+            }
+        }
+
         return ApiResponse.<List<Booking>>builder()
-                .result(bookingRepo.findAll())
+                .result(lists)
                 .build();
     }
 
@@ -69,7 +82,7 @@ public class BookingController {
 
         var room = roomService.findByNumber(bookingDTO.getRoomNumber());
         if (room == null) {
-            throw new ApiException(ApiException.ERROR_CREATE, "Not found room number");
+            throw new ApiException(ApiException.ERROR_CREATE, "Not found room");
         }
         if (!ConstRoom.isRoomAvaiable(room.getRoomStatus().getName())) {
             throw new ApiException(ApiException.ERROR_CREATE, "Room is not avaiable : " + room.getRoomStatus().getName());
