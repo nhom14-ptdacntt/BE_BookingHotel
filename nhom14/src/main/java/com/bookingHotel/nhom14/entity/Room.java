@@ -21,6 +21,6 @@ public class Room {
     private String status;
 
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "roomtype_id")
     private RoomType roomType;
 }

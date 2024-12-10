@@ -19,6 +19,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Configuration
 @RequiredArgsConstructor
@@ -29,7 +30,7 @@ public class ApplicationInitConfig {
     PasswordEncoder passwordEncoder;
 
     @Bean
-    ApplicationRunner createUserDefault(UserRepository userRepository) {
+    ApplicationRunner createUserDefault(UserRepository userRepository, RoomTypeRepository roomTypeRepository) {
         return args -> {
             if (userRepository.findByEmail("admin@admin.com").isEmpty()) {
                 Set<String> roles = new HashSet<String>();
@@ -44,45 +45,26 @@ public class ApplicationInitConfig {
                         .build();
                 userRepository.save(admin);
             }
-        };
-    }
+            List<String> ROOM_TYPE_DEFAULT = List.of("SINGLE", "DOUBLE", "SINGLE_VIP", "DOUBLE_VIP");
 
-    @Bean
-    ApplicationRunner createRoomTypeDefault(RoomTypeRepository roomTypeRepository) {
-        return args -> {
-
-            List<String> ROOM_TYPE_DEFAULT = new ArrayList<>() {
-                {
-                    this.add("SINGLE");
-                    this.add("DOUBLE");
-                    this.add("SINGLE_VIP");
-                    this.add("DOUBLE_VIP");
-                }
-            };
-
-            Map<String, Boolean> roomTypeChecked = new HashMap<>();
-
+// Lấy tất cả RoomType từ database
             var allRoomType = roomTypeRepository.findAll();
 
-            for (RoomType roomType : allRoomType) {
-                for (String name : ROOM_TYPE_DEFAULT) {
-                    if (name.equals(roomType.getName())) {
-                        roomTypeChecked.put(name, Boolean.TRUE);
-                    }
-                }
-            }
+// Tạo Set để kiểm tra nhanh
+            Set<String> existingRoomTypes = allRoomType.stream()
+                    .map(RoomType::getName)
+                    .collect(Collectors.toSet());
 
-            for (Map.Entry<String, Boolean> entry : roomTypeChecked.entrySet()) {
-                String roomTypeName = entry.getKey();
-                Boolean isHave = entry.getValue();
-
-                if (!isHave) {
+// Duyệt qua ROOM_TYPE_DEFAULT và thêm các RoomType còn thiếu
+            for (String roomTypeName : ROOM_TYPE_DEFAULT) {
+                if (!existingRoomTypes.contains(roomTypeName)) {
                     var roomType = new RoomType(roomTypeName);
                     roomTypeRepository.save(roomType);
                 }
-
             }
+
+
         };
     }
-
 }
+
