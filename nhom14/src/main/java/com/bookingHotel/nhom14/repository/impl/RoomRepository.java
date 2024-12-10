@@ -12,6 +12,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface RoomRepository extends BaseRepository<Room, Integer> {
 
-    public Optional<Room> findByNumber(Integer number);
+    public Optional<Room> findByNumber(String number);
 
 }

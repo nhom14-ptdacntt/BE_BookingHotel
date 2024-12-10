@@ -16,7 +16,7 @@ public class Room {
     @Column(nullable = false)
     private int id;
     @Column(nullable = false, unique = true)
-    private int number;
+    private String number;
 
     @ManyToOne
     @JoinColumn(name = "type_id")

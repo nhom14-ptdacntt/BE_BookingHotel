@@ -42,7 +42,7 @@ public class RoomService implements IServiceFind<Room, Integer> {
         return roomRepo.findById(id).orElse(null);
     }
 
-    public Room findByNumber(Integer number) {
+    public Room findByNumber(String number) {
         return roomRepo.findByNumber(number).orElse(null);
     }
 
