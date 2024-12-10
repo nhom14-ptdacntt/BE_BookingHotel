@@ -4,10 +4,14 @@
  */
 package com.bookingHotel.nhom14.service.Impl;
 
+import static com.bookingHotel.nhom14.constant.ConstRoom.STATUS_BOOKED;
+import static com.bookingHotel.nhom14.constant.ConstRoom.STATUS_OCCUPIED;
 import com.bookingHotel.nhom14.dto.RoomDTO;
 import com.bookingHotel.nhom14.entity.Room;
+import com.bookingHotel.nhom14.exception.ApiException;
 import com.bookingHotel.nhom14.mapper.RoomMapper;
 import com.bookingHotel.nhom14.repository.impl.RoomRepository;
+import com.bookingHotel.nhom14.repository.impl.RoomStatusRepository;
 import com.bookingHotel.nhom14.service.IServiceFind;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +26,8 @@ public class RoomService implements IServiceFind<Room, Integer> {
 
     @Autowired
     private RoomRepository roomRepo;
+    @Autowired
+    private RoomStatusRepository roomStatusRepo;
 
     @Autowired
     private RoomMapper roomMapper;
@@ -48,6 +54,25 @@ public class RoomService implements IServiceFind<Room, Integer> {
         roomRepo.deleteById(id);
     }
 
-   
+    public void setRoomStatusAvailable(Room room) {
+        room.setRoomStatus(roomStatusRepo.findById(1)
+                .orElseThrow(
+                        () -> new ApiException(ApiException.ERROR_EDIT, "Room status not found"))
+        );
+    }
+
+    public void setRoomStatusOccupied(Room room) {
+        room.setRoomStatus(roomStatusRepo.findById(2)
+                .orElseThrow(
+                        () -> new ApiException(ApiException.ERROR_EDIT, "Room status not found"))
+        );
+    }
+
+    public void setRoomStatusBooked(Room room) {
+        room.setRoomStatus(roomStatusRepo.findById(3)
+                .orElseThrow(
+                        () -> new ApiException(ApiException.ERROR_EDIT, "Room status not found"))
+        );
+    }
 
 }

@@ -6,12 +6,11 @@ package com.bookingHotel.nhom14.controller;
 
 import com.bookingHotel.nhom14.constant.ConstBooking;
 import com.bookingHotel.nhom14.constant.ConstRoom;
+import com.bookingHotel.nhom14.core.util.Logger;
 import com.bookingHotel.nhom14.core.util.Validator;
 import com.bookingHotel.nhom14.dto.BookingDTO;
-import com.bookingHotel.nhom14.dto.RoomDTO;
 import com.bookingHotel.nhom14.dto.response.ApiResponse;
 import com.bookingHotel.nhom14.entity.Booking;
-import com.bookingHotel.nhom14.entity.BookingStatus;
 import com.bookingHotel.nhom14.entity.Room;
 import com.bookingHotel.nhom14.exception.ApiException;
 import com.bookingHotel.nhom14.repository.impl.BookingRepository;
@@ -84,13 +83,14 @@ public class BookingController {
 
         var booking = new Booking();
         booking.setCustomerName(customerName);
+        booking.setCustomerPhoneNumber(customerPhoneNumber);
         booking.setRoom(room);
         booking.setStatus(bookingStatusRepo.findById(1)
                 .orElseThrow(
                         () -> new ApiException(ApiException.ERROR_CREATE, "Booking status not found"))
         );
 
-        ConstRoom.setRoomStatusBooked(room);
+        roomService.setRoomStatusBooked(room);
         roomService.save(room);
         booking = bookingRepo.save(booking);
 
@@ -120,12 +120,27 @@ public class BookingController {
                         () -> new ApiException(ApiException.ERROR_CREATE, "Booking not found")
                 );
         booking.setCustomerName(customerName);
+        booking.setCustomerPhoneNumber(customerPhoneNumber);
         booking.setRoom(room);
         booking.setStatus(bookingStatusRepo.findByName(bookingDTO.getStatus())
                 .orElseThrow(
                         () -> new ApiException(ApiException.ERROR_CREATE, "Booking status not found"))
         );
-
+        switch (bookingDTO.getStatus()) {
+            case ConstBooking.STATUS_FINISHED:
+            case ConstBooking.STATUS_CANCELLED:
+                roomService.setRoomStatusAvailable(booking.getRoom());
+                break;
+            case ConstBooking.STATUS_PENDING:
+                roomService.setRoomStatusBooked(booking.getRoom());
+                break;
+            case ConstBooking.STATUS_CONFIRMED:
+                roomService.setRoomStatusOccupied(booking.getRoom());
+                break;
+            default:
+                Logger.DebugLogic("Unknow status?? :  " + bookingDTO.getStatus());
+                break;
+        }
         roomService.save(room);
         booking = bookingRepo.save(booking);
 
@@ -157,7 +172,7 @@ public class BookingController {
                         () -> new ApiException(ApiException.ERROR_CREATE, "Booking status not found"))
         );
 
-        ConstRoom.setRoomStatusBooked(booking.getRoom());
+        roomService.setRoomStatusAvailable(booking.getRoom());
         roomService.save(booking.getRoom());
         booking = bookingRepo.save(booking);
 

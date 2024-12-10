@@ -33,19 +33,6 @@ public class ConstRoom {
         return statusName.equals(STATUS_BOOKED);
     }
 
-    public static void setRoomStatusAvailable(Room room) {
-        room.getRoomStatus().setId(1);
-        room.getRoomStatus().setName(STATUS_AVAILABLE);
-    }
-
-    public static void setRoomStatusOccupied(Room room) {
-        room.getRoomStatus().setId(2);
-        room.getRoomStatus().setName(STATUS_OCCUPIED);
-    }
-
-    public static void setRoomStatusBooked(Room room) {
-        room.getRoomStatus().setId(3);
-        room.getRoomStatus().setName(STATUS_BOOKED);
-    }
+  
 
 }
