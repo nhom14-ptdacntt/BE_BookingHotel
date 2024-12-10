@@ -8,11 +8,11 @@ import lombok.ToString;
 public class RoomDTO {
 
     private int id;
-    private String roomNumber;
+    private int roomNumber;
     private int roomTypeId;
     private double price;
     private String checkInDate;
     private String checkOutDate;
-    private String status;
+    private int roomStatusId;
 
 }

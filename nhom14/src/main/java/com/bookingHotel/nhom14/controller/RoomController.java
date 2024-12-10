@@ -8,7 +8,7 @@ import com.bookingHotel.nhom14.dto.RoomDTO;
 import com.bookingHotel.nhom14.dto.response.ApiResponse;
 import com.bookingHotel.nhom14.entity.Room;
 import com.bookingHotel.nhom14.exception.ApiException;
-import com.bookingHotel.nhom14.exception.AppException;
+import com.bookingHotel.nhom14.repository.impl.RoomStatusRepository;
 import com.bookingHotel.nhom14.service.Impl.RoomService;
 import com.bookingHotel.nhom14.service.Impl.RoomTypeService;
 import java.util.List;
@@ -29,6 +29,8 @@ public class RoomController {
 
     @Autowired
     private RoomTypeService roomTypeService;
+    @Autowired
+    private RoomStatusRepository roomStatusRepo;
 
     @Autowired
     private RoomService roomService;
@@ -56,6 +58,30 @@ public class RoomController {
         room.setNumber(roomDTO.getRoomNumber());
         room.setRoomType(roomType);
         room.setPrice(roomDTO.getPrice());
+
+        roomDTO = roomService.save(room);
+
+        return ApiResponse.<RoomDTO>builder()
+                .result(roomDTO)
+                .build();
+    }
+
+    @PostMapping("/create")
+    public ApiResponse createRoom(@RequestBody RoomDTO roomDTO) {
+
+        var roomType = roomTypeService.findById(roomDTO.getRoomTypeId());
+        if (roomType == null) {
+            throw new ApiException(ApiException.ERROR_CREATE, "not found room type id: " + roomDTO.getRoomTypeId());
+        }
+
+        var room = new Room();
+        room.setNumber(roomDTO.getRoomNumber());
+        room.setPrice(roomDTO.getPrice());
+        room.setRoomType(roomType);
+        room.setRoomStatus(roomStatusRepo.findById(1)
+                .orElseThrow(
+                        () -> new ApiException(ApiException.ERROR_CREATE, "Room status not found"))
+        );
 
         roomDTO = roomService.save(room);
 
