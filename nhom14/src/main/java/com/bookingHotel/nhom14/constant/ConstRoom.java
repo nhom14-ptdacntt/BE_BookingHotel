@@ -4,6 +4,7 @@
  */
 package com.bookingHotel.nhom14.constant;
 
+import com.bookingHotel.nhom14.entity.Room;
 import java.util.List;
 
 /**
@@ -12,20 +13,39 @@ import java.util.List;
  */
 public class ConstRoom {
 
+    public static final String STATUS_AVAILABLE = "AVAILABLE";
+    public static final String STATUS_OCCUPIED = "OCCUPIED";
+    public static final String STATUS_BOOKED = "BOOKED";
+
     public static final List<String> //
             ROOM_TYPE_DEFAULT = List.of("SINGLE", "DOUBLE", "SINGLE_VIP", "DOUBLE_VIP"),
-            ROOM_STATUS_DEFAULT = List.of("AVAIABLE", "OCCUPIED", "BOOKED");
+            ROOM_STATUS_DEFAULT = List.of(STATUS_AVAILABLE, STATUS_OCCUPIED, STATUS_BOOKED);
 
     public static boolean isRoomAvaiable(String statusName) {
-        return statusName.equals("AVAIABLE");
+        return statusName.equals(STATUS_AVAILABLE);
     }
 
     public static boolean isRoomOccupied(String statusName) {
-        return statusName.equals("OCCUPIED");
+        return statusName.equals(STATUS_OCCUPIED);
     }
 
     public static boolean isRoomBooked(String statusName) {
-        return statusName.equals("BOOKED");
+        return statusName.equals(STATUS_BOOKED);
+    }
+
+    public static void setRoomStatusAvailable(Room room) {
+        room.getRoomStatus().setId(1);
+        room.getRoomStatus().setName(STATUS_AVAILABLE);
+    }
+
+    public static void setRoomStatusOccupied(Room room) {
+        room.getRoomStatus().setId(2);
+        room.getRoomStatus().setName(STATUS_OCCUPIED);
+    }
+
+    public static void setRoomStatusBooked(Room room) {
+        room.getRoomStatus().setId(3);
+        room.getRoomStatus().setName(STATUS_BOOKED);
     }
 
 }

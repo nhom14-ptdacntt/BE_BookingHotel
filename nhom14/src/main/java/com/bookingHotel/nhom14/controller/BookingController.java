@@ -4,18 +4,21 @@
  */
 package com.bookingHotel.nhom14.controller;
 
+import com.bookingHotel.nhom14.constant.ConstBooking;
 import com.bookingHotel.nhom14.constant.ConstRoom;
 import com.bookingHotel.nhom14.core.util.Validator;
 import com.bookingHotel.nhom14.dto.BookingDTO;
+import com.bookingHotel.nhom14.dto.RoomDTO;
 import com.bookingHotel.nhom14.dto.response.ApiResponse;
 import com.bookingHotel.nhom14.entity.Booking;
+import com.bookingHotel.nhom14.entity.BookingStatus;
+import com.bookingHotel.nhom14.entity.Room;
 import com.bookingHotel.nhom14.exception.ApiException;
 import com.bookingHotel.nhom14.repository.impl.BookingRepository;
 import com.bookingHotel.nhom14.repository.impl.BookingStatusRepository;
 import com.bookingHotel.nhom14.service.Impl.RoomService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import static org.springframework.http.ResponseEntity.status;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -40,13 +43,14 @@ public class BookingController {
                 .build();
     }
 
-    @PostMapping("/create")
-    public synchronized ApiResponse create(@RequestBody BookingDTO bookingDTO) {
-        String customerName = bookingDTO.getCustomerName();
+    private void validateCustomerName(String customerName) {
         if (customerName == null || customerName.isEmpty() || customerName.isBlank()) {
             throw new ApiException(ApiException.ERROR_CREATE, "Customer name cannot be empty or blank");
         }
-        String customerPhoneNumber = bookingDTO.getCustomerPhoneNumber();
+    }
+
+    private void validateCustomerPhoneNumber(String customerPhoneNumber) {
+
         if (customerPhoneNumber == null || customerPhoneNumber.isEmpty() || customerPhoneNumber.isBlank()) {
             throw new ApiException(ApiException.ERROR_CREATE, "Customer phone number cannot be empty or blank");
         }
@@ -54,15 +58,29 @@ public class BookingController {
         if (Validator.isInvalidPhoneNumber(customerPhoneNumber)) {
             throw new ApiException(ApiException.ERROR_CREATE, "Customer phone number is invalid");
         }
+    }
 
-        var room = roomService.findByNumber(bookingDTO.getRoomNumber());
+    private void validateRoom(Room room) {
         if (room == null) {
-            throw new ApiException(ApiException.ERROR_CREATE, "Not found room number : " + bookingDTO.getRoomNumber());
+            throw new ApiException(ApiException.ERROR_CREATE, "Not found room number");
         }
 
         if (!ConstRoom.isRoomAvaiable(room.getRoomStatus().getName())) {
             throw new ApiException(ApiException.ERROR_CREATE, "Room is not avaiable : " + room.getRoomStatus().getName());
         }
+
+    }
+
+    @PostMapping("/create")
+    public synchronized ApiResponse create(@RequestBody BookingDTO bookingDTO) {
+        var customerName = bookingDTO.getCustomerName();
+        this.validateCustomerName(customerName);
+
+        String customerPhoneNumber = bookingDTO.getCustomerPhoneNumber();
+        this.validateCustomerPhoneNumber(customerPhoneNumber);
+
+        var room = roomService.findByNumber(bookingDTO.getRoomNumber());
+        this.validateRoom(room);
 
         var booking = new Booking();
         booking.setCustomerName(customerName);
@@ -72,65 +90,85 @@ public class BookingController {
                         () -> new ApiException(ApiException.ERROR_CREATE, "Booking status not found"))
         );
 
+        ConstRoom.setRoomStatusBooked(room);
+        roomService.save(room);
         booking = bookingRepo.save(booking);
 
         bookingDTO.setCustomerName(booking.getCustomerName());
+        bookingDTO.setCustomerPhoneNumber(booking.getCustomerPhoneNumber());
         bookingDTO.setRoomNumber(booking.getRoom().getNumber());
         bookingDTO.setStatus(booking.getStatus().getName());
 
         return ApiResponse.<Object>builder()
                 .result(bookingDTO)
                 .build();
-
-//        var roomType = roomTypeService.findById(roomDTO.getRoomTypeId());
-//        if (roomType == null) {
-//            throw new ApiException(ApiException.ERROR_CREATE, "not found room type id: " + roomDTO.getRoomTypeId());
-//        }
-//
-//        var room = new Room();
-//        room.setNumber(roomDTO.getRoomNumber());
-//        room.setPrice(roomDTO.getPrice());
-//        room.setRoomType(roomType);
-//        room.setRoomStatus(roomStatusRepo.findById(1)
-//                .orElseThrow(
-//                        () -> new ApiException(ApiException.ERROR_CREATE, "Room status not found"))
-//        );
-//
-//        roomDTO = roomService.save(room);
-//
-//        return ApiResponse.<RoomDTO>builder()
-//                .result(roomDTO)
-//                .build();
     }
 
-//    @PostMapping("/edit/{id}")
-//    public ApiResponse edit(@RequestBody RoomDTO roomDTO, @PathVariable int id) {
-//
-//        var room = roomService.findById(id);
-//        if (room == null) {
-//            throw new ApiException(ApiException.ERROR_FIND, "not found room id: " + roomDTO.getId());
-//        }
-//
-//        var roomType = roomTypeService.findById(roomDTO.getRoomTypeId());
-//        if (roomType == null) {
-//            throw new ApiException(ApiException.ERROR_FIND, "not found room type id: " + roomDTO.getRoomTypeId());
-//        }
-//
-//        room.setNumber(roomDTO.getRoomNumber());
-//        room.setRoomType(roomType);
-//        room.setPrice(roomDTO.getPrice());
-//
-//        roomDTO = roomService.save(room);
-//
-//        return ApiResponse.<RoomDTO>builder()
-//                .result(roomDTO)
-//                .build();
-//    }
-//    @DeleteMapping("/delete/{id}")
-//    public ApiResponse deleteRoom(@PathVariable int id) {
-//        roomService.deleteById(id);
-//        return ApiResponse.<String>builder()
-//                .result("OK")
-//                .build();
-//    }
+    @PostMapping("/edit/{id}")
+    public synchronized ApiResponse edit(@RequestBody BookingDTO bookingDTO, @PathVariable int id) {
+        var customerName = bookingDTO.getCustomerName();
+        this.validateCustomerName(customerName);
+
+        String customerPhoneNumber = bookingDTO.getCustomerPhoneNumber();
+        this.validateCustomerPhoneNumber(customerPhoneNumber);
+
+        var room = roomService.findByNumber(bookingDTO.getRoomNumber());
+        this.validateRoom(room);
+
+        var booking = bookingRepo.findById(id)
+                .orElseThrow(
+                        () -> new ApiException(ApiException.ERROR_CREATE, "Booking not found")
+                );
+        booking.setCustomerName(customerName);
+        booking.setRoom(room);
+        booking.setStatus(bookingStatusRepo.findByName(bookingDTO.getStatus())
+                .orElseThrow(
+                        () -> new ApiException(ApiException.ERROR_CREATE, "Booking status not found"))
+        );
+
+        roomService.save(room);
+        booking = bookingRepo.save(booking);
+
+        bookingDTO.setCustomerName(booking.getCustomerName());
+        bookingDTO.setCustomerPhoneNumber(booking.getCustomerPhoneNumber());
+        bookingDTO.setRoomNumber(booking.getRoom().getNumber());
+        bookingDTO.setStatus(booking.getStatus().getName());
+
+        return ApiResponse.<Object>builder()
+                .result(bookingDTO)
+                .build();
+    }
+
+    @DeleteMapping("/cancel/{id}")
+    public synchronized ApiResponse cancelBooking(@PathVariable int id) {
+
+        var booking = bookingRepo.findById(id)
+                .orElseThrow(
+                        () -> new ApiException(ApiException.ERROR_CREATE, "Booking not found")
+                );
+        if (ConstBooking.isCancelled(booking.getStatus().getName())) {
+            return ApiResponse.<Object>builder()
+                    .result(booking)
+                    .build();
+        }
+
+        booking.setStatus(bookingStatusRepo.findByName(ConstBooking.STATUS_CANCELLED)
+                .orElseThrow(
+                        () -> new ApiException(ApiException.ERROR_CREATE, "Booking status not found"))
+        );
+
+        ConstRoom.setRoomStatusBooked(booking.getRoom());
+        roomService.save(booking.getRoom());
+        booking = bookingRepo.save(booking);
+
+        var bookingDTO = new BookingDTO();
+        bookingDTO.setCustomerName(booking.getCustomerName());
+        bookingDTO.setCustomerPhoneNumber(booking.getCustomerPhoneNumber());
+        bookingDTO.setRoomNumber(booking.getRoom().getNumber());
+        bookingDTO.setStatus(booking.getStatus().getName());
+
+        return ApiResponse.<Object>builder()
+                .result(booking)
+                .build();
+    }
 }

@@ -36,6 +36,8 @@ public class Booking {
     private int id;
     @Column(nullable = false)
     private String customerName;
+    @Column(nullable = false)
+    private String customerPhoneNumber;
     @OneToOne
     @JoinColumn(name = "room", unique = true)
     private Room room;
