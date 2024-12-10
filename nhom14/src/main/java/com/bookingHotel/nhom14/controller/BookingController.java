@@ -40,15 +40,15 @@ public class BookingController {
 
         var lists = bookingRepo.findAll();
 
-        // Dùng Iterator để tránh lỗi ConcurrentModificationException
-        Iterator<Booking> iterator = lists.iterator();
-        while (iterator.hasNext()) {
-            Booking booking = iterator.next();
-            if (ConstBooking.isCancelled(booking.getStatus().getName())
-                    || ConstBooking.isFinished(booking.getStatus().getName())) {
-                iterator.remove(); // Xóa phần tử an toàn
-            }
-        }
+//        // Dùng Iterator để tránh lỗi ConcurrentModificationException
+//        Iterator<Booking> iterator = lists.iterator();
+//        while (iterator.hasNext()) {
+//            Booking booking = iterator.next();
+//            if (ConstBooking.isCancelled(booking.getStatus().getName())
+//                    || ConstBooking.isFinished(booking.getStatus().getName())) {
+//                iterator.remove(); // Xóa phần tử an toàn
+//            }
+//        }
 
         return ApiResponse.<List<Booking>>builder()
                 .result(lists)
