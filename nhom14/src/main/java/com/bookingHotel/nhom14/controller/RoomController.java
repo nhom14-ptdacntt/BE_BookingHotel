@@ -38,6 +38,19 @@ public class RoomController {
                 .build();
     }
 
+    @GetMapping("/get/{id}")
+    public ApiResponse findRoomById(@PathVariable int id) {
+
+        var room = roomService.findById(id);
+        if (room == null) {
+            throw new ApiException(ApiException.ERROR_FIND, "not found room id: " + id);
+        }
+
+        return ApiResponse.<Room>builder()
+                .result(room)
+                .build();
+    }
+
     @PostMapping("/create")
     public ApiResponse createRoom(@RequestBody RoomDTO roomDTO) {
 

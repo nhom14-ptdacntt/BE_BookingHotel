@@ -36,6 +36,10 @@ public class RoomService implements IServiceFind<Room, Integer> {
         return roomRepo.findById(id).orElse(null);
     }
 
+    public Room findByNumber(Integer number) {
+        return roomRepo.findByNumber(number).orElse(null);
+    }
+
     public RoomDTO save(Room room) {
         return roomMapper.roomToRoomDTO(roomRepo.save(room));
     }

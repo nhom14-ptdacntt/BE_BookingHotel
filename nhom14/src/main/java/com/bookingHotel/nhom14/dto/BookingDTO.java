@@ -5,8 +5,12 @@ import lombok.Data;
 @Data
 public class BookingDTO {
 
-    private int roomId;
-    private String roomTypeName;
-    private String description;
+    private int roomNumber;
+    private String customerName;
+    private String customerPhoneNumber;
+    /**
+     * Cái này chỉ gửi cho client
+     */
+    private String status;
 
 }

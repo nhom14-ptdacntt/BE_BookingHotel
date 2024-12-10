@@ -34,6 +34,7 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(nullable = false)
     private int id;
+    @Column(nullable = false)
     private String customerName;
     @OneToOne
     @JoinColumn(name = "room", unique = true)
