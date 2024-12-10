@@ -13,11 +13,7 @@ import com.bookingHotel.nhom14.service.Impl.RoomService;
 import com.bookingHotel.nhom14.service.Impl.RoomTypeService;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  *
@@ -43,9 +39,9 @@ public class RoomController {
     }
 
     @PostMapping("/edit/{id}")
-    public ApiResponse editRoom(@RequestBody RoomDTO roomDTO) {
+    public ApiResponse editRoom(@RequestBody RoomDTO roomDTO, @RequestParam int id) {
 
-        var room = roomService.findById(roomDTO.getId());
+        var room = roomService.findById(id);
         if (room == null) {
             throw new ApiException(ApiException.ERROR_FIND, "not found room id: " + roomDTO.getId());
         }
